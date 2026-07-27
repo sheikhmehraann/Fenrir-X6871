@@ -11,7 +11,7 @@ An enterprise-grade, forensically verified bootloader security patch suite and r
 
 ## 📌 Executive Summary
 
-Fenrir modifies low-level Little Kernel (`lk.img`) execution flows to preserve **Strong Play Integrity** and **Green Verified Boot State** while running custom kernels, custom recoveries, and ported ROMs. It eliminates unlocked bootloader logo warnings, emulates a locked state to OS system properties, and removes vendor fastboot command restrictions without compromising device security.
+Fenrir modifies low-level Little Kernel execution flows to preserve **Strong Play Integrity** and **Green Verified Boot State** while running custom kernels, custom recoveries, and ported ROMs. It eliminates unlocked bootloader logo warnings, emulates a locked state to OS system properties, and removes vendor fastboot command restrictions without compromising device security.
 
 ---
 
@@ -30,10 +30,10 @@ Fenrir modifies low-level Little Kernel (`lk.img`) execution flows to preserve *
 > [!NOTE]
 > Fenrir operates directly at the Little Kernel layer, overriding security evaluation routines prior to OS boot handoff.
 
-- 🟢 **Green Verified Boot State**: Overrides `set_verified_boot_state()` to force state `0` (`GREEN`), eliminating boot warnings and passing Play Integrity checks.
-- 🔒 **Stealth Lock Emulation**: Intercepts `get_lock_state()` to return `LKS_LOCK` (`4`). System apps and Fastboot queries report a **Locked** bootloader.
-- 🔓 **Fastboot Command Set Unlocking**: Overrides `sec_get_vfy_policy` to unlock all 165 Fastboot and OEM streaming commands.
-- ⚡ **AVB & Verity Policy Enforcement**: Retains `veritymode=enforcing` in memory, allowing custom boot and recovery images to execute without breaking safety attestations.
+- 🟢 **Green Verified Boot State**: Forces Green boot state, eliminating boot warnings and passing Play Integrity checks.
+- 🔒 **Stealth Lock Emulation**: Emulates bootloader state as locked. System apps and Fastboot queries report a **Locked** bootloader.
+- 🔓 **Fastboot Command Set Unlocking**: Overrides security verification policy to unlock all 165 Fastboot and OEM streaming commands.
+- ⚡ **AVB & Verity Policy Enforcement**: Retains enforcing verity mode in memory, allowing custom boot and recovery images to execute without breaking safety attestations.
 
 ---
 
