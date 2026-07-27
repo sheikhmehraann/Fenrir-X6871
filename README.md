@@ -12,15 +12,15 @@ Professional, pre-patched bootloader suite and custom recovery setup for the **I
 
 ## 📱 Supported Target Firmware Builds
 
-- **Android 15**: `X6871-15.1.2.180SP05-OP001PF001AZ` (Tested on `15.1.2.65` and `15.1.2.180`)
-- **Android 14**: `X6871-H962CF-U-OP-250217V2673` (Tested on `V2673`, strict version match required)
+- **Android 15 (XOS 15)**: `X6871-15.1.2.180SP05-OP001PF001AZ` (Tested on `15.1.2.165` and `15.1.2.180`)
+- **Android 14 (XOS 14)**: `X6871-H962CF-U-OP-250217V2673` (Base XOS 14, strict version match required)
 
 ---
 
 ## ⚠️ Firmware & Component Compatibility Notes
 
-- **Android 14 (`A14`)**: The `lk.img` is strict and works **ONLY** on its matching base version (`X6871-H962CF-U-OP-250217V2673`). Do not attempt to cross-flash across different A14 builds.
-- **Android 15 (`A15`)**: Tested & verified on build versions `15.1.2.65` and `15.1.2.180` (`X6871-15.1.2.180SP05-OP001PF001AZ`).
+- **Android 14 (`A14`)**: Based on **XOS 14**. The `lk.img` is strict and works **ONLY** on its matching base version (`X6871-H962CF-U-OP-250217V2673`). Do not attempt to cross-flash across different A14 builds.
+- **Android 15 (`A15`)**: Based on **XOS 15**. Tested & verified on build versions `15.1.2.165` and `15.1.2.180` (`X6871-15.1.2.180SP05-OP001PF001AZ`).
 - **Patched Recovery (`vendor_boot.img`)**: Based on `OrangeFox-R12.0_20260508_15.1.2-Unofficial-X6871`, modified with AVB flags removed.
 
 ---
