@@ -19,9 +19,9 @@ Fenrir modifies low-level Little Kernel (`lk.img`) execution flows to preserve *
 
 | Android Version | Operating System | Verified Build Target | Status | Notes |
 |:---:|:---:|:---|:---:|:---|
-| **Android 15** | XOS 15 | `X6871-15.1.2.165SP05(OP001PF001AZ)` | ✅ Production Verified | Tested on `15.1.2.165` & `15.1.2.180` |
-| **Android 15** | XOS 15 | `X6871-15.1.2.180SP05(OP001PF001AZ)` | ✅ Production Verified | Full AVB & FBE v2 recovery support |
-| **Android 14** | XOS 14 | `X6871-H962CF-U-OP-250217V2673` | ✅ Production Verified | Strict base build match required |
+| **Android 15** | XOS 15 | `X6871-15.1.2.165SP05(OP001PF001AZ)` | ✅ Tested & Verified | Production Build |
+| **Android 15** | XOS 15 | `X6871-15.1.2.180SP05(OP001PF001AZ)` | ✅ Tested & Verified | Production Build |
+| **Android 14** | XOS 14 | `X6871-H962CF-U-OP-250217V2673` | ✅ Tested & Verified | Strict base build match required |
 
 ---
 
