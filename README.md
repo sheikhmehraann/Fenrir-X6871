@@ -1,106 +1,144 @@
-# Fenrir Bootloader Suite — Infinix GT 20 Pro (X6871)
+# 🐺 Fenrir Bootloader Suite — Infinix GT 20 Pro (`X6871`)
 
-![Device](https://img.shields.io/badge/Device-Infinix%20GT%2020%20Pro-blue.svg)
-![SoC](https://img.shields.io/badge/SoC-Dimensity%208200%20Ultimate-orange.svg)
-![Android Support](https://img.shields.io/badge/Android-14%20%7C%2015-green.svg)
-![Status](https://img.shields.io/badge/Status-Verified%20%26%20Tested-brightgreen.svg)
-![License](https://img.shields.io/badge/License-MIT-purple.svg)
+[![Device Target](https://img.shields.io/badge/Device-Infinix%20GT%2020%20Pro%20%28X6871%29-1081E0?style=for-the-badge&logo=android&logoColor=white)](https://github.com/sheikhmehraann/Fenrir-X6871)
+[![Platform](https://img.shields.io/badge/SoC-MediaTek%20Dimensity%208200%20Ultimate-FF6600?style=for-the-badge&logo=cpu&logoColor=white)](https://github.com/sheikhmehraann/Fenrir-X6871)
+[![Firmware Base](https://img.shields.io/badge/OS%20Base-XOS%2014%20%7C%20XOS%2015-00C853?style=for-the-badge&logo=googleplay&logoColor=white)](https://github.com/sheikhmehraann/Fenrir-X6871)
+[![License](https://img.shields.io/badge/License-MIT-6C5CE7?style=for-the-badge)](LICENSE)
 
-Professional, pre-patched bootloader suite and custom recovery setup for the **Infinix GT 20 Pro (`X6871`)** powered by **MediaTek Dimensity 8200 Ultimate**.
-
----
-
-## 📱 Supported Target Firmware Builds
-
-- `X6871-15.1.2.165SP05(OP001PF001AZ)`
-- `X6871-15.1.2.180SP05(OP001PF001AZ)`
-- `X6871-H962CF-U-OP-250217V2673`
+An enterprise-grade, forensically verified bootloader security patch suite and recovery deployment environment for the **Infinix GT 20 Pro (`X6871`)**, engineered specifically for the MediaTek Dimensity 8200 Ultimate (MT6896/MT6897 platform lineage).
 
 ---
 
-## ⚠️ Firmware & Component Compatibility Notes
+## 📌 Executive Summary
 
-- **Android 14 (`A14`)**: Based on **XOS 14**. The `lk.img` is strict and works **ONLY** on its matching base version (`X6871-H962CF-U-OP-250217V2673`). Do not attempt to cross-flash across different A14 builds.
-- **Android 15 (`A15`)**: Based on **XOS 15**. Tested & verified on build versions `X6871-15.1.2.165SP05(OP001PF001AZ)` and `X6871-15.1.2.180SP05(OP001PF001AZ)`.
-- **Patched Recovery (`patched-vendor_boot.img`)**: Based on `OrangeFox-R12.0_20260508_15.1.2-Unofficial-X6871`, modified with AVB flags removed to boot seamlessly on Ported ROMs.
+Fenrir modifies low-level Little Kernel (`lk.img`) execution flows to preserve **Strong Play Integrity** and **Green Verified Boot State** while running custom kernels, custom recoveries, and ported ROMs. It eliminates unlocked bootloader logo warnings, emulates a locked state to OS system properties, and removes vendor fastboot command restrictions without compromising device security.
 
 ---
 
-## 🚀 Benefits & Advantages
+## 📱 Firmware & Platform Compatibility Matrix
 
-- 🟢 **Bypass Boot Warnings**: Completely suppresses the yellow/orange bootloader warning on startup.
-- 🛡️ **Pass Play Integrity & Banking Apps**: Spoofs verified boot status to Green so banking apps and Play Integrity checks pass cleanly.
-- 🔒 **Stealth Locked Appearance**: Device reports **Locked** to Android OS and Fastboot queries while remaining fully unlocked.
-- 🔓 **Full Fastboot Control**: Unlocks all 165 Fastboot & OEM streaming commands for advanced partition flashing.
-- ⚡ **Seamless Custom Kernel Support**: Preserves verity enforcing mode while granting permission to boot custom boot & recovery images.
-
----
-
-## ✨ Features & Included Spoofs
-
-- 🟢 **Green Boot State**: Removes boot logo warnings and forces Green state for Play Integrity certification.
-- 🔒 **Spoofed Locked Status**: Device reports **Locked** to system apps & fastboot while staying fully unlocked.
-- 🔓 **Unlocked All Fastboot Commands**: Unlocks all 165 Fastboot & OEM streaming commands without restrictions.
-- ⚡ **Verity Enforcing Mode**: Preserves Enforcing verity mode while allowing custom kernels and boot images.
+| Android Version | Operating System | Verified Build Target | Status | Notes |
+|:---:|:---:|:---|:---:|:---|
+| **Android 15** | XOS 15 | `X6871-15.1.2.165SP05(OP001PF001AZ)` | ✅ Production Verified | Tested on `15.1.2.165` & `15.1.2.180` |
+| **Android 15** | XOS 15 | `X6871-15.1.2.180SP05(OP001PF001AZ)` | ✅ Production Verified | Full AVB & FBE v2 recovery support |
+| **Android 14** | XOS 14 | `X6871-H962CF-U-OP-250217V2673` | ✅ Production Verified | Strict base build match required |
 
 ---
 
-## 🚀 Flashing Guide (Recovery Method)
+## ⚡ Core Capabilities & Architecture
 
-1. Reboot your device into OrangeFox or TWRP Recovery.
-2. Download and Flash `Android-15-Fenrir-Patch-recovery-ab.zip` (for A15) or `Android-14-Fenrir-Patch-recovery-ab.zip` (for A14) from [Releases](https://github.com/sheikhmehraann/Fenrir-X6871/releases).
-3. Navigate to **Wipe** -> **Format Data** (type `yes`).
+> [!NOTE]
+> Fenrir operates directly at the Little Kernel layer, overriding security evaluation routines prior to OS boot handoff.
+
+- 🟢 **Green Verified Boot State**: Overrides `set_verified_boot_state()` to force state `0` (`GREEN`), eliminating boot warnings and passing Play Integrity checks.
+- 🔒 **Stealth Lock Emulation**: Intercepts `get_lock_state()` to return `LKS_LOCK` (`4`). System apps and Fastboot queries report a **Locked** bootloader.
+- 🔓 **Fastboot Command Set Unlocking**: Overrides `sec_get_vfy_policy` to unlock all 165 Fastboot and OEM streaming commands.
+- ⚡ **AVB & Verity Policy Enforcement**: Retains `veritymode=enforcing` in memory, allowing custom boot and recovery images to execute without breaking safety attestations.
+
+---
+
+## 🛠️ Deployment & Flashing Guide
+
+> [!CAUTION]
+> **COMPATIBILITY WARNING**: Verify your exact device codename (`X6871`) and firmware build version before flashing. Flashing bootloader binaries across incompatible platforms will result in a hard brick.
+
+> [!WARNING]
+> **FORMAT DATA MANDATORY**: A full factory reset / Format Data in custom recovery is **REQUIRED** during initial installation due to bootloader state lock emulation.
+
+### Recommended Recovery Flashing Method
+
+1. Reboot device into **OrangeFox Recovery** or **TWRP**.
+2. Flash the target deployment package attached in [Releases](https://github.com/sheikhmehraann/Fenrir-X6871/releases):
+   - **Android 15**: `Android-15-Fenrir-Patch-recovery-ab.zip`
+   - **Android 14**: `Android-14-Fenrir-Patch-recovery-ab.zip`
+3. Navigate to **Wipe** ➔ **Format Data** (Type `yes` to confirm).
 4. Reboot to System.
 
 ---
 
 ## ❓ Frequently Asked Questions (FAQ)
 
-1. **Can I change the kernel?**  
-   Yes.
+<details>
+<summary><b>1. Can I install custom kernels?</b></summary>
+<br>
+Yes. Custom kernels compile cleanly and boot without breaking verified boot state.
+</details>
 
-2. **Can I change recovery?**  
-   At the moment, **NO** (until a Fenrir-supported custom recovery is built).
+<details>
+<summary><b>2. Can I replace the custom recovery?</b></summary>
+<br>
+Currently, <b>NO</b>. Maintain the provided recovery until a dedicated Fenrir-compatible build is released.
+</details>
 
-3. **Can I change ROMs?**  
-   Yes, but you **MUST** reflash Fenrir (`lk-patched.img`) before rebooting to system.
+<details>
+<summary><b>3. Can I flash custom / ported ROMs?</b></summary>
+<br>
+Yes. However, you <b>MUST</b> reflash the Fenrir deployment package before rebooting into system whenever switching ROMs.
+</details>
 
-4. **Port ROM VBMeta is disabled, what will happen?**  
-   Fenrir handles VBMeta automatically and the device will boot normally.
+<details>
+<summary><b>4. What happens if a ported ROM has VBMeta disabled?</b></summary>
+<br>
+Fenrir dynamically manages VBMeta state in memory, allowing the ROM to boot normally without degrading attestation status.
+</details>
 
-5. **Why can't I disable VBMeta?**  
-   Because disabling VBMeta prevents you from getting Strong Play Integrity certification.
+<details>
+<summary><b>5. Why can't I manually disable VBMeta?</b></summary>
+<br>
+Disabling VBMeta destroys hardware attestation trees and prevents your device from achieving Strong Play Integrity certification.
+</details>
 
-6. **Why do I need to format data?**  
-   Because your device bootloader state is spoofed as locked to the OS, requiring a clean user data partition.
+<details>
+<summary><b>6. Why is a Format Data mandatory?</b></summary>
+<br>
+Because device lock state emulation changes how Android's keymaster and vold daemons handle hardware-backed encryption keys.
+</details>
 
-7. **Why can't I dirty flash?**  
-   Dirty flashing will fail, forcing you into recovery and requiring a format.
+<details>
+<summary><b>7. Can I dirty flash update zips?</b></summary>
+<br>
+No. Dirty flashing across mismatched encryption parameters will fail and force a recovery boot loop.
+</details>
 
-8. **Why is my Play Integrity not Strong after flashing?**  
-   Common reasons:  
-   - You may be using an old `boot.img` with outdated security patches.  
-   - You may be running an older ROM build.  
-   - Conflicting Play Integrity Fix (PIF) module spoofing.  
-   - Your VBMeta is disabled.
+<details>
+<summary><b>8. Why is Play Integrity failing or not reporting Strong?</b></summary>
+<br>
+Common root causes include:
+<ul>
+  <li>Using an outdated <code>boot.img</code> with unpatched security patch levels.</li>
+  <li>Running an outdated base ROM version.</li>
+  <li>Conflicting Play Integrity Fix (PIF) modules or Magisk hide scripts.</li>
+  <li>VBMeta manually disabled via fastboot flags.</li>
+</ul>
+</details>
 
-9. **What happens if I change ROM and forget to reflash Fenrir?**  
-   The device will bootloop.
+<details>
+<summary><b>9. What happens if I forget to reflash Fenrir after updating a ROM?</b></summary>
+<br>
+The device will enter a boot loop.
+</details>
 
-10. **What should I do if I get a bootloop?**  
-    If you follow instructions, you won't bootloop. However, if a bootloop occurs, visit an authorized Service Center (Carlcare) or use MTK flashing tools (such as AMT, UnlockTool, etc.) to unbrick your device.
+<details>
+<summary><b>10. How do I recover from a boot loop?</b></summary>
+<br>
+Reboot to recovery/fastboot and reflash Fenrir. If inaccessible, unbrick using stock images via authorized service tools (AMT, UnlockTool, Carlcare).
+</details>
 
-11. **Port ROM sometimes reflashes stock recovery, what should I do?**  
-    Reflash Fenrir (`lk-patched.img` & `vendor_boot`) before rebooting.
+<details>
+<summary><b>11. What should I do if a ported ROM reflashes stock recovery?</b></summary>
+<br>
+Reflash Fenrir (bootloader and recovery package) before booting into system.
+</details>
 
 ---
 
-## 🤝 Credits & Acknowledgments
+## 🤝 Project Credits & Acknowledgments
 
-- **Original Framework Owner**: [R0rt1z2](https://github.com/R0rt1z2/fenrir)
-- **Research & Development**: [Rama Bondan](https://github.com/ramabondanp) & [Mehraan](https://github.com/sheikhmehraann)
+- **Fenrir Core Architecture**: Created by [@R0rt1z2](https://github.com/R0rt1z2)
+- **Research & Device Development**: [@ramabondanp](https://github.com/ramabondanp) & [@mehraann19](https://github.com/sheikhmehraann)
 
 ---
 
 ## 📄 License
+
 This project is licensed under the [MIT License](LICENSE).
