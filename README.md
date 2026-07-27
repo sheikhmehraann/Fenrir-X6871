@@ -45,25 +45,12 @@ Professional, pre-patched bootloader suite and custom recovery setup for the **I
 
 ---
 
-## 🚀 Flashing Guide
+## 🚀 Flashing Guide (Recovery Method)
 
-### For Android 15 (A15):
-```bash
-fastboot flash lk_a A15/lk-patched.img
-fastboot flash lk_b A15/lk-patched.img
-fastboot flash vbmeta_a A15/vbmeta-stock.img
-fastboot flash vbmeta_b A15/vbmeta-stock.img
-fastboot flash vendor_boot_a A15/vendor_boot-orangefox.img
-fastboot flash vendor_boot_b A15/vendor_boot-orangefox.img
-fastboot reboot
-```
-
-### For Android 14 (A14):
-```bash
-fastboot flash lk_a A14/lk-patched.img
-fastboot flash lk_b A14/lk-patched.img
-fastboot reboot
-```
+1. Reboot your device into OrangeFox or TWRP Recovery.
+2. Download and Flash `Android-15-Fenrir-Patch-recovery-ab.zip` (for A15) or `Android-14-Fenrir-Patch-recovery-ab.zip` (for A14) from [Releases](https://github.com/sheikhmehraann/Fenrir-X6871/releases).
+3. Navigate to **Wipe** -> **Format Data** (type `yes`).
+4. Reboot to System.
 
 ---
 
