@@ -89,7 +89,7 @@ fastboot reboot
 ## 🤝 Credits & Acknowledgments
 
 - **Fenrir Framework**: Created by [R0rt1z2](https://github.com/R0rt1z2/fenrir)
-- **Research & Development**: [Rama Bondan](https://github.com/ramabondanp) & [Mehraan](https://github.com/sheikhmehraann)
+- **Research & Development**: [Mehraan](https://github.com/sheikhmehraann)
 
 ---
 
