@@ -17,39 +17,22 @@ Professional, pre-patched bootloader suite and custom recovery setup for the **I
 
 ---
 
+## 🚀 Benefits & Capabilities
+
+- 🟢 **Bypass Boot Warnings**: Completely suppresses the annoying yellow/orange unlocked bootloader warning on startup.
+- 🛡️ **Pass Play Integrity & Banking Apps**: Spoofs verified boot status to Green so device integrity and banking apps work seamlessly.
+- 🔒 **Stealth Locked Appearance**: Device reports **Locked** to Android OS and Fastboot queries while remaining fully unlocked.
+- 🔓 **Full Fastboot Control**: Unlocks all 157 Fastboot & OEM streaming commands for advanced partition flashing.
+- ⚡ **Seamless Custom Kernel Support**: Preserves verity enforcing mode while granting permission to boot custom boot & recovery images.
+
+---
+
 ## ✨ Features & Included Spoofs
 
 - 🟢 **Green Boot State**: Removes boot logo warnings and forces Green state for Play Integrity certification.
 - 🔒 **Spoofed Locked Status**: Device reports **Locked** to system apps & fastboot while staying fully unlocked.
 - 🔓 **Unlocked All Fastboot Commands**: Unlocks all Fastboot & OEM streaming commands without restrictions.
 - ⚡ **Verity Enforcing Mode**: Preserves Enforcing verity mode while allowing custom kernels and boot images.
-
----
-
-## 📁 Repository Structure
-
-```
-REPO-X6871-Fenrir/
-├── A14/                                # Android 14 Package
-│   ├── lk-patched.img                 # Patched A14 Bootloader
-│   ├── lk-stock-backup.img            # Stock A14 LK Backup
-│   ├── flash_a14.bat                  # 1-Click Windows Flasher
-│   └── flash_a14.sh                   # 1-Click Linux / macOS Flasher
-├── A15/                                # Android 15 Package
-│   ├── lk-patched.img                 # Patched A15 Bootloader
-│   ├── lk-stock-backup.img            # Stock A15 LK Backup
-│   ├── vbmeta-stock.img               # Stock A15 VBMETA
-│   ├── vendor_boot-orangefox.img      # OrangeFox Recovery (vendor_boot)
-│   ├── flash_a15.bat                  # 1-Click Windows Flasher
-│   └── flash_a15.sh                   # 1-Click Linux / macOS Flasher
-├── Tools/                              # Build & Verification Tools
-│   ├── build_a14.py                   # A14 Builder
-│   ├── build_a15.py                   # A15 Builder
-│   └── verify.py                      # Verification Tool
-├── .gitignore
-├── LICENSE
-└── README.md
-```
 
 ---
 
