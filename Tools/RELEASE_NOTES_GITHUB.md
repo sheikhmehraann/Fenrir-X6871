@@ -11,30 +11,20 @@
 
 ---
 
-### ✨ Features & Capabilities
-- 🟢 **Play Integrity / Green State**: Grants Green verified boot state without needing Play Integrity Fix (PIF) modules or Magisk hide routines.
-- 🔒 **Stealth Locked Bootloader**: Spoofs device status as **Locked** to system apps & Fastboot while remaining fully unlocked.
-- 🔓 **Unlocked All Fastboot Commands**: Completely unlocks all 165 Fastboot & OEM streaming commands without restrictions.
-- ⚡ **Enforcing Verity Mode**: Retains `veritymode=enforcing` while permitting custom boot & recovery image execution.
-- 🔘 **Hardware Fastboot Trigger**: Holding **Volume Down** on startup boots directly into Fastboot (Bootloader) mode.
-- 🦊 **OrangeFox Recovery Support**: Pre-tuned recovery image (`patched-vendor_boot.img`) with AVB flags removed for seamless port ROM booting.
-
----
-
 ### 🛠️ Installation Instructions
 
 > [!WARNING]
-> **FORMAT DATA REQUIRED**: A factory reset / Format Data in recovery is mandatory after initial flashing due to locked state spoofing.
+> **FORMAT DATA REQUIRED**: A factory reset / Format Data in recovery is **REQUIRED** after initial flashing because the device state is spoofed as locked to the OS.
 
-#### Method 1: Recovery Flashable ZIP (Recommended)
-1. Reboot your device into OrangeFox / TWRP Recovery.
+#### Method 1: Flash via Custom Recovery (OrangeFox / TWRP)
+1. Reboot your device into OrangeFox or TWRP Recovery.
 2. Flash `Android-15-Fenrir-Patch-recovery-ab.zip` (for A15) or `Android-14-Fenrir-Patch-recovery-ab.zip` (for A14).
-3. Go to **Wipe** -> **Format Data** (type `yes`).
+3. Navigate to **Wipe** -> **Format Data** (type `yes`).
 4. Reboot to System.
 
-#### Method 2: Fastboot Mode Flashing
+#### Method 2: Manual Fastboot Flashing
 
-**Android 15 (`A15`)**:
+**For Android 15 (`A15`)**:
 ```bash
 fastboot flash lk_a A15/lk-patched.img
 fastboot flash lk_b A15/lk-patched.img
@@ -45,7 +35,7 @@ fastboot flash vendor_boot_b A15/vendor_boot-orangefox.img
 fastboot reboot
 ```
 
-**Android 14 (`A14`)**:
+**For Android 14 (`A14`)**:
 ```bash
 fastboot flash lk_a A14/lk-patched.img
 fastboot flash lk_b A14/lk-patched.img
