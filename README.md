@@ -6,7 +6,7 @@
 ![Status](https://img.shields.io/badge/Status-Verified%20%26%20Tested-brightgreen.svg)
 ![License](https://img.shields.io/badge/License-MIT-purple.svg)
 
-Professional, pre-patched bootloader suite and custom recovery setup for the **Infinix GT 20 Pro (`X6871`)** powered by **MediaTek Dimensity 8200 Ultimate**.
+Professional, pre-patched bootloader suite, custom recovery setup, and **Recovery Flashable Zips** for the **Infinix GT 20 Pro (`X6871`)** powered by **MediaTek Dimensity 8200 Ultimate**.
 
 ---
 
@@ -45,9 +45,26 @@ Professional, pre-patched bootloader suite and custom recovery setup for the **I
 
 ---
 
+## 📦 Recovery Flashable Zips (NEW!)
+
+You can now flash Fenrir directly via **Custom Recovery (TWRP / OrangeFox)**:
+
+1. **Android 15 Recovery Flashable Zip**: `A15/Android-15-Fenrir-Patch-recovery-ab.zip`
+   - Automatically flashes `lk.img`, `vbmeta.img`, and `vendor_boot.img` to both `_a` and `_b` slots using `update-binary` with `zstd` decompression.
+2. **Android 14 Recovery Flashable Zip**: `A14/Android-14-Fenrir-Patch-recovery-ab.zip`
+   - Automatically flashes `vbmeta.img` and `lk.img` across active A/B slots.
+
+---
+
 ## 🚀 Flashing Guide
 
-### For Android 15 (A15):
+### Method 1: Via Recovery (Recommended)
+1. Reboot into OrangeFox Recovery.
+2. Flash `A15/Android-15-Fenrir-Patch-recovery-ab.zip` (for A15) or `A14/Android-14-Fenrir-Patch-recovery-ab.zip` (for A14).
+3. Reboot System.
+
+### Method 2: Fastboot Mode
+#### For Android 15 (A15):
 ```bash
 fastboot flash lk_a A15/lk-patched.img
 fastboot flash lk_b A15/lk-patched.img
@@ -58,7 +75,7 @@ fastboot flash vendor_boot_b A15/vendor_boot-orangefox.img
 fastboot reboot
 ```
 
-### For Android 14 (A14):
+#### For Android 14 (A14):
 ```bash
 fastboot flash lk_a A14/lk-patched.img
 fastboot flash lk_b A14/lk-patched.img
