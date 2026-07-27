@@ -10,11 +10,18 @@ Professional, pre-patched bootloader suite and custom recovery setup for the **I
 
 ---
 
-## ⚠️ Firmware Compatibility Notes
+## 📱 Supported Target Firmware Builds
+
+- **Android 15**: `X6871-15.1.2.180SP05-OP001PF001AZ` (Tested on `15.1.2.65` and `15.1.2.180`)
+- **Android 14**: `X6871-H962CF-U-OP-250217V2673` (Tested on `V2673`, strict version match required)
+
+---
+
+## ⚠️ Firmware & Component Compatibility Notes
 
 - **Android 14 (`A14`)**: The `lk.img` is strict and works **ONLY** on its matching base version (`X6871-H962CF-U-OP-250217V2673`). Do not attempt to cross-flash across different A14 builds.
 - **Android 15 (`A15`)**: Tested & verified on build versions `15.1.2.65` and `15.1.2.180` (`X6871-15.1.2.180SP05-OP001PF001AZ`).
-- **Patched Recovery (`vendor_boot.img`)**: Based on `OrangeFox-R12.0_20260508_15.1.2-Unofficial-X6871`, modified to boot Fenrir cleanly on Ported ROMs with full storage decryption.
+- **Patched Recovery (`vendor_boot.img`)**: Based on `OrangeFox-R12.0_20260508_15.1.2-Unofficial-X6871`, modified with AVB flags removed.
 
 ---
 
@@ -23,7 +30,7 @@ Professional, pre-patched bootloader suite and custom recovery setup for the **I
 - 🟢 **Bypass Boot Warnings**: Completely suppresses the yellow/orange bootloader warning on startup.
 - 🛡️ **Pass Play Integrity & Banking Apps**: Spoofs verified boot status to Green so banking apps and Play Integrity checks pass cleanly.
 - 🔒 **Stealth Locked Appearance**: Device reports **Locked** to Android OS and Fastboot queries while remaining fully unlocked.
-- 🔓 **Full Fastboot Control**: Unlocks all 157 Fastboot & OEM streaming commands for advanced partition flashing.
+- 🔓 **Full Fastboot Control**: Unlocks all 165 Fastboot & OEM streaming commands for advanced partition flashing.
 - ⚡ **Seamless Custom Kernel Support**: Preserves verity enforcing mode while granting permission to boot custom boot & recovery images.
 
 ---
@@ -32,7 +39,7 @@ Professional, pre-patched bootloader suite and custom recovery setup for the **I
 
 - 🟢 **Green Boot State**: Removes boot logo warnings and forces Green state for Play Integrity certification.
 - 🔒 **Spoofed Locked Status**: Device reports **Locked** to system apps & fastboot while staying fully unlocked.
-- 🔓 **Unlocked All Fastboot Commands**: Unlocks all Fastboot & OEM streaming commands without restrictions.
+- 🔓 **Unlocked All Fastboot Commands**: Unlocks all 165 Fastboot & OEM streaming commands without restrictions.
 - ⚡ **Verity Enforcing Mode**: Preserves Enforcing verity mode while allowing custom kernels and boot images.
 
 ---
