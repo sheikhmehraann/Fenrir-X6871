@@ -20,10 +20,9 @@ Professional, pre-patched bootloader suite and custom recovery setup for the **I
 ## ✨ Features & Included Spoofs
 
 - 🟢 **Green Boot State**: Removes boot logo warnings and forces Green state for Play Integrity certification.
-- 🔒 **Spoofed Locked Status**: Device reports **Locked** (`LKS_LOCK`) to system apps & fastboot while staying fully unlocked.
+- 🔒 **Spoofed Locked Status**: Device reports **Locked** to system apps & fastboot while staying fully unlocked.
 - 🔓 **Unlocked All Fastboot Commands**: Unlocks all Fastboot & OEM streaming commands without restrictions.
 - ⚡ **Verity Enforcing Mode**: Preserves Enforcing verity mode while allowing custom kernels and boot images.
-- 🦊 **OrangeFox Recovery Support**: Pre-tuned `vendor_boot.img` for Android 15 with full internal storage decryption support.
 
 ---
 
