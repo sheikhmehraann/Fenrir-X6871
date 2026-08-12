@@ -5,7 +5,7 @@
 [![Firmware Base](https://img.shields.io/badge/OS%20Base-XOS%2014%20%7C%20XOS%2015-00C853?style=for-the-badge&logo=googleplay&logoColor=white)](https://github.com/sheikhmehraann/Fenrir-X6871)
 [![License](https://img.shields.io/badge/License-MIT-6C5CE7?style=for-the-badge)](LICENSE)
 
-An enterprise-grade, forensically verified bootloader security patch suite and recovery deployment environment for the **Infinix GT 20 Pro (`X6871`)**, engineered specifically for the MediaTek Dimensity 8200 Ultimate (MT6896/MT6897 platform lineage).
+An enterprise-grade, forensically verified bootloader security patch suite and recovery deployment environment for the **Infinix GT 20 Pro (`X6871`)**, engineered specifically for the MediaTek Dimensity 8200 Ultimate (MT6895/MT6896 platform lineage).
 
 ---
 
