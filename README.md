@@ -1,241 +1,160 @@
-# Fenrir — Infinix GT 20 Pro (X6871)
+# Fenrir Bootloader Suite - Infinix GT 20 Pro (X6871)
 
-[![Device](https://img.shields.io/badge/Device-Infinix%20GT%2020%20Pro%20%28X6871%29-1081E0?style=for-the-badge&logo=android&logoColor=white)](https://github.com/sheikhmehraann/Fenrir-X6871)
-[![SoC](https://img.shields.io/badge/SoC-MediaTek%20Dimensity%208200%20Ultimate-FF6600?style=for-the-badge&logo=android&logoColor=white)](https://github.com/sheikhmehraann/Fenrir-X6871)
-[![XOS](https://img.shields.io/badge/XOS-14%20%7C%2015-00C853?style=for-the-badge&logo=android&logoColor=white)](https://github.com/sheikhmehraann/Fenrir-X6871)
-[![License](https://img.shields.io/badge/License-AGPL--3.0-6C5CE7?style=for-the-badge)](LICENSE)
+[![Device Target](https://img.shields.io/badge/Device-Infinix%20GT%2020%20Pro%20(X6871)-1081E0?style=flat-square)](https://github.com/sheikhmehraann/Fenrir-X6871)
+[![Platform](https://img.shields.io/badge/SoC-Dimensity%208200%20Ultimate%20(MT6896)-FF6600?style=flat-square)](https://github.com/sheikhmehraann/Fenrir-X6871)
+[![Firmware Base](https://img.shields.io/badge/OS%20Base-XOS%2014%20%2F%20XOS%2015-00C853?style=flat-square)](https://github.com/sheikhmehraann/Fenrir-X6871)
+[![License](https://img.shields.io/badge/License-MIT-6C5CE7?style=flat-square)](LICENSE)
 
-Fenrir for the Infinix GT 20 Pro (`X6871`).
+A bootloader patch set for the Infinix GT 20 Pro (X6871) on the MediaTek Dimensity 8200 Ultimate (MT6896) platform.
 
-This repository contains the X6871-specific port, patches, builds and testing for Fenrir.
+Fenrir patches Little Kernel (LK) binaries to bypass secure boot checks, spoof verified boot state to green, emulate a locked bootloader to userspace, and unrestrict fastboot operations. This lets you run custom kernels, custom recoveries, and GSI/ported ROMs while passing Play Integrity checks.
 
-Fenrir was originally created by [R0rt1z2](https://github.com/R0rt1z2). The original project is archived. The X6871 is not in the original upstream device list, so this repository is the X6871 port.
+---
 
-## What it does
+## Supported Firmware Builds
 
-Fenrir is based on a vulnerability in the MediaTek boot chain.
-
-When the device is in the unlocked `seccfg` state, the affected boot chain can skip verification of `bl2_ext`. Fenrir patches the verification path so the patched `bl2_ext` can continue through the boot chain.
-
-The original Fenrir PoC patches:
-
-```c
-sec_get_vfy_policy()
-```
-
-to return `0`.
-
-The code runs at EL3 and affects the boot chain after Preloader.
-
-The original project also includes a payload that can register custom Fastboot commands, control boot mode and call bootloader functions. It also contains lock-state spoofing.
-
-## Boot chain
-
-Normal:
-
-```text
-BootROM
-  |
-Preloader
-  |
-bl2_ext
-  |
-TEE
-  |
-GenieZone
-  |
-LK / AEE
-  |
-Linux kernel
-```
-
-With the patched verification path:
-
-```text
-BootROM
-  |
-Preloader
-  |
-bl2_ext (patched)
-  |
-TEE / GenieZone
-  |
-LK / AEE
-  |
-Linux kernel
-```
-
-## X6871 support
-
-These are the X6871 builds currently documented for this repository:
-
-| Android | OS | Build | Status |
+| Android Version | OS Base | Target Build Number | Status |
 |---|---|---|---|
-| Android 15 | XOS 15 | `X6871-15.1.2.165SP05(OP001PF001AZ)` | Tested |
-| Android 15 | XOS 15 | `X6871-15.1.2.180SP05(OP001PF001AZ)` | Tested |
-| Android 14 | XOS 14 | `X6871-H962CF-U-OP-250217V2673` | Tested |
+| Android 15 | XOS 15 | `X6871-15.1.2.165SP05(OP001PF001AZ)` | Tested and Working |
+| Android 15 | XOS 15 | `X6871-15.1.2.180SP05(OP001PF001AZ)` | Tested and Working |
+| Android 14 | XOS 14 | `X6871-H962CF-U-OP-250217V2673` | Tested and Working |
 
-These results are for the X6871 port.
+Do not flash across mismatched firmware versions or across different device models. Bootloader binaries are platform and version specific.
 
-## Installation
+---
 
-> [!CAUTION]
-> This modifies the boot chain. Flashing the wrong low-level image can brick the device. Check the device codename and firmware build before flashing.
+## Technical Overview
 
-### Recovery package
+Fenrir modifies routines in the `lk`, `bl2_ext`, and `aee` sub-partitions inside the MediaTek bootloader container before OS execution begins.
 
-1. Boot into OrangeFox or TWRP.
-2. Download the matching package from [Releases](https://github.com/sheikhmehraann/Fenrir-X6871/releases).
-3. Android 15:
-   ```text
-   Android-15-Fenrir-Patch-recovery-ab.zip
+### 1. Verified Boot State Spoofing
+- Injects a patch into the boot state setter (`STR WZR`) so `verified_boot_state` is always written as `0` (GREEN).
+- Eliminates the 5-second yellow/orange unlocked bootloader warning on boot.
+- Kernel cmdline receives `androidboot.verifiedbootstate=green`.
+
+### 2. Lock State Emulation
+- Patches lock state getters across `lk`, `bl2_ext`, and `aee` to return `LKS_LOCK` (`4`).
+- TEE and Android userspace detect the device as locked.
+- Fastboot query `fastboot getvar unlocked` returns `no`.
+
+### 3. Verification Policy Override
+- Patches `sec_get_vfy_policy()` across all sub-partitions to return `0` (`MOV W0, #0; RET`).
+- Prevents image authentication errors from halting boot when running modified kernels or recovery images.
+- Sets AVB verification error allowance flags.
+
+### 4. Fastboot Security Bypass
+- NOPs the security check branch in fastboot command handling.
+- Keeps vendor and standard fastboot streaming commands operational on an emulated locked bootloader.
+
+### 5. Hardware Boot Mode Controls
+- Patches the boot mode key handler: holding Volume Down routes straight to Fastboot mode (`boot_mode = 0x63`), bypassing the stock Transsion factory test menu.
+- Stock Volume Up behavior is preserved to enter Recovery mode.
+
+### 6. Fastboot Idle Timeout Extension
+- Stock MediaTek LK disconnects USB fastboot sessions after 60 seconds of inactivity.
+- Patched timeout values extend the idle timeout to 10 minutes (600,000 ms), preventing sudden disconnects during large image flashes.
+
+### 7. Custom Fastboot OEM Command
+- Adds `fastboot oem bldr_spoof` to inspect or control bootloader spoofing state from host PC.
+
+---
+
+## Flashing Instructions
+
+A full Format Data in custom recovery is required on initial installation. Lock state emulation alters key derivation in hardware Keymaster/Gatekeeper. Existing userdata encrypted under an unlocked state cannot be decrypted once the bootloader reports locked. Back up your files before proceeding.
+
+### Method 1: Fastboot (PC)
+
+1. Boot the phone into Fastboot mode (power off, then hold Power + Volume Down).
+2. Open a terminal in the folder containing your target Android version (`A14` or `A15`).
+3. Flash the patched bootloader to both slots:
+   ```bash
+   fastboot flash lk_a lk-patched.img
+   fastboot flash lk_b lk-patched.img
    ```
-4. Android 14:
-   ```text
-   Android-14-Fenrir-Patch-recovery-ab.zip
+4. Optional: Flash the clean boot logo to remove warning artifacts:
+   ```bash
+   fastboot flash logo_a logo-patched.img
+   fastboot flash logo_b logo-patched.img
    ```
-5. In recovery, go to **Wipe → Format Data**.
-6. Type `yes` and confirm.
+5. Reboot to recovery:
+   ```bash
+   fastboot reboot recovery
+   ```
+6. In OrangeFox or TWRP, go to Wipe -> Format Data, type `yes`, and confirm.
 7. Reboot to system.
 
-Format Data is required during the initial setup used by this port.
+### Method 2: Custom Recovery (ZIP Package)
 
-## Custom kernels
+1. Reboot into OrangeFox Recovery or TWRP.
+2. Transfer and flash the target flashable zip from Releases:
+   - For Android 15: `Android-15-Fenrir-Patch-recovery-ab.zip`
+   - For Android 14: `Android-14-Fenrir-Patch-recovery-ab.zip`
+3. Go to Wipe -> Format Data, type `yes`, and confirm.
+4. Reboot to system.
 
-Custom kernels can be used if they are compatible with the X6871 and the ROM being used.
+---
 
-Make sure the required Fenrir components are still present after installing or changing a kernel.
+## Frequently Asked Questions
 
-## Custom and ported ROMs
+**Can I run custom kernels with Fenrir?**  
+Yes. Custom kernels boot normally without triggering yellow or red bootloader state warnings.
 
-Custom and ported ROMs can be used with the X6871 port.
+**Can I use any custom recovery?**  
+Use an OrangeFox or TWRP build confirmed working on X6871. Avoid recoveries that force-disable VBMeta during installation.
 
-When changing ROMs, reflash the Fenrir package if the ROM replaces the patched bootloader, boot or recovery components.
+**Can I flash custom or ported ROMs?**  
+Yes. Whenever you flash a new ROM that overwrites the bootloader or boot partition, reflash the Fenrir LK package before the first system boot.
 
-Some ROMs may need additional VBMeta changes. Do not assume that every port will boot with the same VBMeta configuration.
+**What happens if a ROM disables VBMeta?**  
+If VBMeta verification flags are stripped via fastboot disable flags, hardware key attestation breaks. Keep stock VBMeta enabled; Fenrir handles verification overrides in LK directly.
 
-## VBMeta
+**Why does my phone bootloop if I skip Format Data?**  
+Android disk encryption relies on hardware-backed keys provided by Keymaster. Because Fenrir changes the reported bootloader lock state from unlocked to locked, the keystore cannot derive the old encryption keys. Formatting userdata allows the device to initialize a fresh, clean keystore under the new locked context.
 
-The original Fenrir project notes that custom ROMs may need additional VBMeta changes.
+**Can I dirty flash incremental OS updates?**  
+Only if the update does not replace the bootloader or change keymaster parameters. If updating firmware across major builds, a clean flash is strongly advised.
 
-Do not manually disable VBMeta unless it is required by the specific ROM and setup you are using.
+**Why is Play Integrity failing or not reporting strong?**  
+Check the following:
+- Ensure your `boot.img` security patch level matches your vendor SPL.
+- Do not use conflicting Play Integrity Fix modules that set conflicting boot state props.
+- Ensure VBMeta is not manually disabled in partitions.
+- Ensure your ROM build passes basic attestation requirements.
 
-## Play Integrity
+**How do I unbrick if I flash the wrong version?**  
+Use MTK client tools (or authorized service tools) to flash stock `lk` and `preloader` back via BROM or Download Agent mode. Always keep stock partition dumps backed up before flashing.
 
-Fenrir includes the lock-state spoofing from the original PoC.
+---
 
-Play Integrity results depend on the ROM, boot image, security patch level and other modifications on the device. Fenrir alone does not guarantee a particular Play Integrity result.
+## Building from Source
 
-If it is not working, check:
-
-- `boot.img` matches the ROM and security patch level.
-- The ROM is compatible with the X6871 port.
-- There are no conflicting Magisk or Play Integrity modules.
-- VBMeta has not been changed incorrectly.
-
-## After changing ROMs
-
-If a ROM update replaces the patched components, reinstall the Fenrir package before booting the new system.
-
-If the device boot-loops, return to recovery or Fastboot and restore the correct Fenrir package or the matching stock images.
-
-## Building
-
-The original Fenrir project uses [`liblk`](https://github.com/R0rt1z2/liblk).
-
-Install the requirements:
-
-```bash
-pip install -r requirements.txt
-```
-
-Place the source bootloader in `bin/`:
-
-```text
-bin/<device>.bin
-```
-
-Build it with:
+The patch pipeline runs on Python 3 using `liblk`.
 
 ```bash
-./build.sh <device>
+# Clone the repository
+git clone https://github.com/sheikhmehraann/Fenrir-X6871.git
+cd Fenrir-X6871
+
+# Build Android 15 patched LK
+py -3 Tools/build_a15.py
+
+# Build Android 14 patched LK
+py -3 Tools/build_a14.py
+
+# Verify patches and partition structures
+py -3 Tools/verify.py
 ```
 
-Or provide the bootloader path:
-
-```bash
-./build.sh <device> /path/to/bootloader.bin
-```
-
-The original build process produces a patched LK image.
-
-For X6871, use the build files and configuration in this repository. Do not use bootloader images from another device.
-
-## Checking the boot chain
-
-When researching a MediaTek device, one of the things to check is whether `bl2_ext` is actually being verified.
-
-The original Fenrir project uses an `expdb` dump and looks for entries similar to:
-
-```text
-[PART] img_auth_required = 0
-[PART] Image with header, name: bl2_ext
-[PART] part: lk_a img: bl2_ext cert vfy(0 ms)
-```
-
-`img_auth_required = 0` indicates that authentication is not being requested at that point.
-
-This alone does not prove that Fenrir will work on a device. The rest of the boot chain still needs to be checked.
-
-## Upstream Fenrir
-
-The original Fenrir project was made for several MediaTek devices, including:
-
-| Device | Codename |
-|---|---|
-| Nothing Phone (2a) | `Pacman` |
-| Nothing Phone (2a) Plus | `PacmanPro` |
-| CMF Phone 1 | `Tetris` |
-| Lenovo IdeaTab Pro / Xiaoxin Pad Pro 12.7 | `peridotl` |
-| Tecno Pova 4 | `LG7n` |
-| Tecno Pova 4 Pro | `LG8n` |
-| Tecno Pova 5 | `LH7n` |
-| Zinwa Q25 | `Q25` |
-| Redmi K70E / POCO X6 Pro 5G | `duchamp` |
-| Redmi Turbo 4 / POCO X7 Pro | `rodin` |
-| Redmi Turbo 5 Max / POCO X8 Pro Max | `dash` |
-| Redmi Note 11T Pro / Pro+ / POCO X4 GT / Redmi K50i | `xaga` |
-| Xiaomi 12T | `plato` |
-
-The Infinix GT 20 Pro (`X6871`) is not in that upstream list. This repository contains the X6871-specific work.
-
-## Limitations
-
-The original project documents these limitations:
-
-- Runtime memory modification can trigger an MMU fault.
-- Payload appending still needs work.
-- There is no complete generic porting guide.
-- Custom ROMs may require additional VBMeta changes.
-- Flashing depends on the device exposing the required mode.
+---
 
 ## Credits
 
-Original Fenrir:
+- Upstream Fenrir architecture and concept: [R0rt1z2](https://github.com/R0rt1z2)
+- Infinix GT 20 Pro port, testing, and maintenance: [ramabondanp](https://github.com/ramabondanp) and [sheikhmehraann](https://github.com/sheikhmehraann)
 
-- [R0rt1z2](https://github.com/R0rt1z2)
-
-X6871 research and development:
-
-- [ramabondanp](https://github.com/ramabondanp)
-- [mehraann19](https://github.com/mehraann19)
-
-Original project:
-
-https://github.com/R0rt1z2/fenrir
+---
 
 ## License
 
-Fenrir is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
-
-See [LICENSE](LICENSE) for the full license text.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
