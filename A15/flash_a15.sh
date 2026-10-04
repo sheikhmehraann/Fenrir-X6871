@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -e
-echo "Flashing Fenrir A15 (X6871)..."
+echo "Flashing Renkai A15 (X6871)..."
 fastboot flash lk_a lk-patched.img
 fastboot flash lk_b lk-patched.img
 

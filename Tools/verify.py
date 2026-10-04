@@ -3,11 +3,18 @@
 
 import sys, os, struct, hashlib
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, os.path.join(BASE_DIR, "Fenrir-2.0"))
-sys.path.insert(0, os.path.join(BASE_DIR, "Fenrir-2.0", "core"))
+TOOLS_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_DIR = os.path.dirname(TOOLS_DIR)
+BASE_DIR = os.path.dirname(REPO_DIR)
 
-from liblk.image import LkImage
+renkai_path = os.path.join(BASE_DIR, "Renkai")
+if os.path.exists(renkai_path):
+    sys.path.insert(0, renkai_path)
+    from renkai.core.liblk.image import LkImage
+else:
+    sys.path.insert(0, os.path.join(BASE_DIR, "Fenrir-2.0"))
+    sys.path.insert(0, os.path.join(BASE_DIR, "Fenrir-2.0", "core"))
+    from liblk.image import LkImage
 
 def calc_sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
@@ -62,10 +69,10 @@ def verify_image(label: str, stock_path: str, patched_path: str, expected_patche
     return all_ok
 
 def main():
-    a15_stock = os.path.join(BASE_DIR, "Fenrir-X6871", "A15", "lk-stock-backup.img")
-    a15_patched = os.path.join(BASE_DIR, "Fenrir-X6871", "A15", "lk-patched.img")
-    a14_stock = os.path.join(BASE_DIR, "Fenrir-X6871", "A14", "lk-stock-backup.img")
-    a14_patched = os.path.join(BASE_DIR, "Fenrir-X6871", "A14", "lk-patched.img")
+    a15_stock = os.path.join(REPO_DIR, "A15", "lk-stock-backup.img")
+    a15_patched = os.path.join(REPO_DIR, "A15", "lk-patched.img")
+    a14_stock = os.path.join(REPO_DIR, "A14", "lk-stock-backup.img")
+    a14_patched = os.path.join(REPO_DIR, "A14", "lk-patched.img")
 
     a15_checks = [
         {'name': 'Force Green State', 'part': 'lk', 'hex': '280300d01f7d09b9c0035fd6', 'min_count': 1},

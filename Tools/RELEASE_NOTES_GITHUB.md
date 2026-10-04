@@ -1,6 +1,6 @@
-# Fenrir v1.0.0 - Infinix GT 20 Pro (X6871)
+# Renkai v1.0.0 - Infinix GT 20 Pro (X6871)
 
-Initial public release of the Fenrir bootloader patch suite for the Infinix GT 20 Pro (X6871) powered by MediaTek Dimensity 8200 Ultimate (MT6896).
+Initial public release of the Renkai bootloader patch suite for the Infinix GT 20 Pro (X6871) powered by MediaTek Dimensity 8200 Ultimate (MT6896).
 
 This release provides patched Little Kernel (LK) images for both Android 14 and Android 15 firmware lines, allowing users to run custom kernels, recoveries, and ROMs with a spoofed green verified boot state and emulated locked bootloader.
 
@@ -56,8 +56,8 @@ Notice: A complete Format Data in custom recovery is required during initial set
 
 1. Boot into OrangeFox or TWRP.
 2. Flash the zip file matching your firmware:
-   - Android 15: `Android-15-Fenrir-Patch-recovery-ab.zip`
-   - Android 14: `Android-14-Fenrir-Patch-recovery-ab.zip`
+   - Android 15: `Android-15-Renkai-Patch-recovery-ab.zip`
+   - Android 14: `Android-14-Renkai-Patch-recovery-ab.zip`
 3. Format Data in recovery (type `yes`).
 4. Reboot to system.
 
@@ -72,10 +72,10 @@ Notice: A complete Format Data in custom recovery is required during initial set
    Use any confirmed OrangeFox or TWRP recovery build for X6871.
 
 3. Can I flash custom or ported ROMs?  
-   Yes. Whenever you flash a ROM that replaces the bootloader, reflash the Fenrir package before booting into system.
+   Yes. Whenever you flash a ROM that replaces the bootloader, reflash the Renkai package before booting into system.
 
 4. What happens if a ROM disables VBMeta?  
-   Disabling VBMeta manually strips attestation flags. Leave stock VBMeta untouched; Fenrir bypasses verification inside LK directly.
+   Disabling VBMeta manually strips attestation flags. Leave stock VBMeta untouched; Renkai bypasses verification inside LK directly.
 
 5. Why is Format Data mandatory?  
    Android disk encryption ties key derivation to bootloader lock state via Keymaster. When switching to emulated locked state, existing data cannot be decrypted. A clean format is necessary.
@@ -87,7 +87,7 @@ Notice: A complete Format Data in custom recovery is required during initial set
    Make sure your kernel security patch level matches your vendor SPL, VBMeta is intact, and you do not have conflicting modules overriding system props.
 
 8. How do I recover from a bootloop?  
-   Reboot into fastboot or recovery and reflash the correct Fenrir package. If recovery is unreachable, restore stock lk using MTK flash tools.
+   Reboot into fastboot or recovery and reflash the correct Renkai package. If recovery is unreachable, restore stock lk using MTK flash tools.
 
 ---
 
@@ -99,6 +99,6 @@ This release is verified against and integrated with the [Renkai](https://github
 
 ## Credits
 
-- Upstream Fenrir project: [R0rt1z2](https://github.com/R0rt1z2/fenrir)
 - Renkai unified framework: [Renkai](https://github.com/sheikhmehraann/Renkai)
+- Upstream Fenrir project: [R0rt1z2](https://github.com/R0rt1z2/fenrir)
 - Infinix GT 20 Pro port and testing: [ramabondanp](https://github.com/ramabondanp) and [sheikhmehraann](https://github.com/sheikhmehraann)

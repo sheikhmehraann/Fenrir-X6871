@@ -1,4 +1,4 @@
-# Fenrir Bootloader Suite - Infinix GT 20 Pro (X6871)
+# Renkai Bootloader Suite - Infinix GT 20 Pro (X6871)
 
 [![Device Target](https://img.shields.io/badge/Device-Infinix%20GT%2020%20Pro%20(X6871)-1081E0?style=flat-square)](https://github.com/sheikhmehraann/Fenrir-X6871)
 [![Platform](https://img.shields.io/badge/SoC-Dimensity%208200%20Ultimate%20(MT6896)-FF6600?style=flat-square)](https://github.com/sheikhmehraann/Fenrir-X6871)
@@ -6,11 +6,9 @@
 [![Renkai Engine](https://img.shields.io/badge/Engine-Renkai%20v1.0-8A2BE2?style=flat-square)](https://github.com/sheikhmehraann/Renkai)
 [![License](https://img.shields.io/badge/License-MIT-6C5CE7?style=flat-square)](LICENSE)
 
-A bootloader patch set for the Infinix GT 20 Pro (X6871) on the MediaTek Dimensity 8200 Ultimate (MT6896) platform.
+A bootloader patch set for the Infinix GT 20 Pro (X6871) on the MediaTek Dimensity 8200 Ultimate (MT6896) platform, powered by the [Renkai](https://github.com/sheikhmehraann/Renkai) unified bootloader framework.
 
-Fenrir patches Little Kernel (LK) binaries to bypass secure boot checks, spoof verified boot state to green, emulate a locked bootloader to userspace, and unrestrict fastboot operations. This lets you run custom kernels, custom recoveries, and GSI/ported ROMs while passing Play Integrity checks.
-
-This repository is powered by and integrated with the [Renkai](https://github.com/sheikhmehraann/Renkai) unified bootloader engine.
+Renkai patches Little Kernel (LK) binaries to bypass secure boot checks, spoof verified boot state to green, emulate a locked bootloader to userspace, and unrestrict fastboot operations. This lets you run custom kernels, custom recoveries, and GSI/ported ROMs while passing Play Integrity checks.
 
 ---
 
@@ -28,7 +26,7 @@ Do not flash across mismatched firmware versions or across different device mode
 
 ## Technical Overview
 
-Fenrir modifies routines in the `lk`, `bl2_ext`, and `aee` sub-partitions inside the MediaTek bootloader container before OS execution begins.
+Renkai modifies routines in the `lk`, `bl2_ext`, and `aee` sub-partitions inside the MediaTek bootloader container before OS execution begins.
 
 ### 1. Verified Boot State Spoofing
 - Injects a patch into the boot state setter (`STR WZR`) so `verified_boot_state` is always written as `0` (GREEN).
@@ -62,17 +60,14 @@ Fenrir modifies routines in the `lk`, `bl2_ext`, and `aee` sub-partitions inside
 
 ---
 
-## Renkai Unified Engine Integration
+## Renkai Unified Architecture
 
-The Infinix GT 20 Pro profiles (`x6871_a15` and `x6871_a14`) are integrated into [Renkai](https://github.com/sheikhmehraann/Renkai), a unified next-generation toolkit combining Fenrir and Kaeru.
+This repository contains the official target device configuration and tested dumps for Infinix GT 20 Pro (X6871), powered by the [Renkai](https://github.com/sheikhmehraann/Renkai) core engine.
 
-### Key Renkai Architecture Features
 - **Multi-Partition GFH Container Pipeline**: Rebuilds GFH headers, section tables, and partition alignments using `liblk` v3.2.0.
 - **Dual-Mode Certificate Engine**: Automatically signs patched images using either public key hash blocks (`OVERRIDE` mode, used on X6871) or BitString wrapper envelopes (`WRAP` mode).
 - **Automated Verification**: Structural validation of GFH magic (`0x58881688`), certificate ASN.1 DER chains, and disassembly opcode match verification.
-- **Multi-Device Support**: Unified definitions across MediaTek Dimensity and Helio platforms (Infinix, Nothing, CMF, Xiaomi, POCO, Tecno, Lenovo, itel).
-
-For multi-device builds and unified tooling, visit the [Renkai Repository](https://github.com/sheikhmehraann/Renkai).
+- **Cross-Platform Compatibility**: Unified codebase supporting devices across Transsion (Infinix, Tecno, itel), Xiaomi/POCO, Nothing/CMF, and Lenovo.
 
 ---
 
@@ -105,8 +100,8 @@ A full Format Data in custom recovery is required on initial installation. Lock 
 
 1. Reboot into OrangeFox Recovery or TWRP.
 2. Transfer and flash the target flashable zip from Releases:
-   - For Android 15: `Android-15-Fenrir-Patch-recovery-ab.zip`
-   - For Android 14: `Android-14-Fenrir-Patch-recovery-ab.zip`
+   - For Android 15: `Android-15-Renkai-Patch-recovery-ab.zip`
+   - For Android 14: `Android-14-Renkai-Patch-recovery-ab.zip`
 3. Go to Wipe -> Format Data, type `yes`, and confirm.
 4. Reboot to system.
 
@@ -114,20 +109,20 @@ A full Format Data in custom recovery is required on initial installation. Lock 
 
 ## Frequently Asked Questions
 
-**Can I run custom kernels with Fenrir?**  
+**Can I run custom kernels with Renkai?**  
 Yes. Custom kernels boot normally without triggering yellow or red bootloader state warnings.
 
 **Can I use any custom recovery?**  
 Use an OrangeFox or TWRP build confirmed working on X6871. Avoid recoveries that force-disable VBMeta during installation.
 
 **Can I flash custom or ported ROMs?**  
-Yes. Whenever you flash a new ROM that overwrites the bootloader or boot partition, reflash the Fenrir LK package before the first system boot.
+Yes. Whenever you flash a new ROM that overwrites the bootloader or boot partition, reflash the Renkai LK package before the first system boot.
 
 **What happens if a ROM disables VBMeta?**  
-If VBMeta verification flags are stripped via fastboot disable flags, hardware key attestation breaks. Keep stock VBMeta enabled; Fenrir handles verification overrides in LK directly.
+If VBMeta verification flags are stripped via fastboot disable flags, hardware key attestation breaks. Keep stock VBMeta enabled; Renkai handles verification overrides in LK directly.
 
 **Why does my phone bootloop if I skip Format Data?**  
-Android disk encryption relies on hardware-backed keys provided by Keymaster. Because Fenrir changes the reported bootloader lock state from unlocked to locked, the keystore cannot derive the old encryption keys. Formatting userdata allows the device to initialize a fresh, clean keystore under the new locked context.
+Android disk encryption relies on hardware-backed keys provided by Keymaster. Because Renkai changes the reported bootloader lock state from unlocked to locked, the keystore cannot derive the old encryption keys. Formatting userdata allows the device to initialize a fresh, clean keystore under the new locked context.
 
 **Can I dirty flash incremental OS updates?**  
 Only if the update does not replace the bootloader or change keymaster parameters. If updating firmware across major builds, a clean flash is strongly advised.
@@ -182,9 +177,9 @@ py -3 Tools/verify.py
 
 ## Related Projects and Credits
 
-- Upstream Fenrir architecture and concept: [R0rt1z2](https://github.com/R0rt1z2)
-- Renkai unified multi-device engine: [Renkai](https://github.com/sheikhmehraann/Renkai)
-- Infinix GT 20 Pro port, testing, and maintenance: [ramabondanp](https://github.com/ramabondanp) and [sheikhmehraann](https://github.com/sheikhmehraann)
+- Unified Framework & Multi-Device Tooling: [Renkai](https://github.com/sheikhmehraann/Renkai)
+- Upstream Research & Architecture: [R0rt1z2](https://github.com/R0rt1z2)
+- Infinix GT 20 Pro Port, Testing, & Maintenance: [ramabondanp](https://github.com/ramabondanp) and [sheikhmehraann](https://github.com/sheikhmehraann)
 
 ---
 

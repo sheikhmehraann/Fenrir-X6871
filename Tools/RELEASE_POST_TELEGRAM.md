@@ -1,4 +1,4 @@
-Fenrir for Infinix GT 20 Pro (X6871)
+Renkai for Infinix GT 20 Pro (X6871)
 
 Initial release for Android 14 and Android 15.
 
@@ -18,11 +18,12 @@ Supported Firmware Builds:
 
 Installation:
 1. Boot to OrangeFox Recovery or TWRP
-2. Flash the Fenrir recovery zip for your Android version
+2. Flash the Renkai recovery zip for your Android version
 3. Format Data (mandatory on first install due to key derivation changes)
 4. Reboot system
 
 Credits:
-- R0rt1z2 (upstream Fenrir framework)
+- Renkai Framework: https://github.com/sheikhmehraann/Renkai
+- Upstream Fenrir framework: R0rt1z2
 - ramabondanp
 - mehraann19
