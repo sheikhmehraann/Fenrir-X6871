@@ -3,11 +3,14 @@
 [![Device Target](https://img.shields.io/badge/Device-Infinix%20GT%2020%20Pro%20(X6871)-1081E0?style=flat-square)](https://github.com/sheikhmehraann/Fenrir-X6871)
 [![Platform](https://img.shields.io/badge/SoC-Dimensity%208200%20Ultimate%20(MT6896)-FF6600?style=flat-square)](https://github.com/sheikhmehraann/Fenrir-X6871)
 [![Firmware Base](https://img.shields.io/badge/OS%20Base-XOS%2014%20%2F%20XOS%2015-00C853?style=flat-square)](https://github.com/sheikhmehraann/Fenrir-X6871)
+[![Renkai Engine](https://img.shields.io/badge/Engine-Renkai%20v1.0-8A2BE2?style=flat-square)](https://github.com/sheikhmehraann/Renkai)
 [![License](https://img.shields.io/badge/License-MIT-6C5CE7?style=flat-square)](LICENSE)
 
 A bootloader patch set for the Infinix GT 20 Pro (X6871) on the MediaTek Dimensity 8200 Ultimate (MT6896) platform.
 
 Fenrir patches Little Kernel (LK) binaries to bypass secure boot checks, spoof verified boot state to green, emulate a locked bootloader to userspace, and unrestrict fastboot operations. This lets you run custom kernels, custom recoveries, and GSI/ported ROMs while passing Play Integrity checks.
+
+This repository is powered by and integrated with the [Renkai](https://github.com/sheikhmehraann/Renkai) unified bootloader engine.
 
 ---
 
@@ -56,6 +59,20 @@ Fenrir modifies routines in the `lk`, `bl2_ext`, and `aee` sub-partitions inside
 
 ### 7. Custom Fastboot OEM Command
 - Adds `fastboot oem bldr_spoof` to inspect or control bootloader spoofing state from host PC.
+
+---
+
+## Renkai Unified Engine Integration
+
+The Infinix GT 20 Pro profiles (`x6871_a15` and `x6871_a14`) are integrated into [Renkai](https://github.com/sheikhmehraann/Renkai), a unified next-generation toolkit combining Fenrir and Kaeru.
+
+### Key Renkai Architecture Features
+- **Multi-Partition GFH Container Pipeline**: Rebuilds GFH headers, section tables, and partition alignments using `liblk` v3.2.0.
+- **Dual-Mode Certificate Engine**: Automatically signs patched images using either public key hash blocks (`OVERRIDE` mode, used on X6871) or BitString wrapper envelopes (`WRAP` mode).
+- **Automated Verification**: Structural validation of GFH magic (`0x58881688`), certificate ASN.1 DER chains, and disassembly opcode match verification.
+- **Multi-Device Support**: Unified definitions across MediaTek Dimensity and Helio platforms (Infinix, Nothing, CMF, Xiaomi, POCO, Tecno, Lenovo, itel).
+
+For multi-device builds and unified tooling, visit the [Renkai Repository](https://github.com/sheikhmehraann/Renkai).
 
 ---
 
@@ -129,7 +146,22 @@ Use MTK client tools (or authorized service tools) to flash stock `lk` and `prel
 
 ## Building from Source
 
-The patch pipeline runs on Python 3 using `liblk`.
+### Option A: Renkai Unified Engine (Recommended)
+
+Requires the [Renkai](https://github.com/sheikhmehraann/Renkai) repository cloned adjacent to this project.
+
+```bash
+# Build and verify all supported versions (A14 and A15)
+py -3 Tools/build_renkai.py --version all
+
+# Build only Android 15
+py -3 Tools/build_renkai.py --version a15
+
+# Build only Android 14
+py -3 Tools/build_renkai.py --version a14
+```
+
+### Option B: Standalone Pipeline
 
 ```bash
 # Clone the repository
@@ -148,9 +180,10 @@ py -3 Tools/verify.py
 
 ---
 
-## Credits
+## Related Projects and Credits
 
 - Upstream Fenrir architecture and concept: [R0rt1z2](https://github.com/R0rt1z2)
+- Renkai unified multi-device engine: [Renkai](https://github.com/sheikhmehraann/Renkai)
 - Infinix GT 20 Pro port, testing, and maintenance: [ramabondanp](https://github.com/ramabondanp) and [sheikhmehraann](https://github.com/sheikhmehraann)
 
 ---

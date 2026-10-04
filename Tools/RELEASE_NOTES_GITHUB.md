@@ -91,7 +91,14 @@ Notice: A complete Format Data in custom recovery is required during initial set
 
 ---
 
+## Renkai Integration
+
+This release is verified against and integrated with the [Renkai](https://github.com/sheikhmehraann/Renkai) unified bootloader framework. Renkai provides multi-partition GFH container rebuilding, dual-mode certificate signing, and automated test verification for MediaTek devices across multiple platforms.
+
+---
+
 ## Credits
 
 - Upstream Fenrir project: [R0rt1z2](https://github.com/R0rt1z2/fenrir)
+- Renkai unified framework: [Renkai](https://github.com/sheikhmehraann/Renkai)
 - Infinix GT 20 Pro port and testing: [ramabondanp](https://github.com/ramabondanp) and [sheikhmehraann](https://github.com/sheikhmehraann)
