@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+/build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.venv/
+venv/
+ENV/
+
+# Intermediate payload build objects (keep payload/build/x6871/stage1/payload.bin tracked as fallback)
+payload/build/*/stage1/*.o
+payload/build/*/stage1/*.elf
+payload/build/*/stage1/linker_resolved.x
+
+# Temporary test files
+*.tmp
+*.bak
+test_build*.img
+expdb.bin
+
+# OS artifacts
+.DS_Store
+Thumbs.db
