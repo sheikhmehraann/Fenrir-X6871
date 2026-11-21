@@ -236,7 +236,7 @@ fastboot flash lk_a x6871-fenrir.bin
 fastboot flash lk_b x6871-fenrir.bin
 ```
 
-### Step 3: Flash Disabled VBMeta (Required for Custom System / DSU / GSI Ports Custom Roms)
+### Step 3: Flash Disabled VBMeta (Required for DSU / GSI / Ports / Custom Roms)
 If booting custom partitions or modifying system images, flash an AVB VBMeta image with `flags = 2`:
 ```bash
 # Generate disabled vbmeta from stock
