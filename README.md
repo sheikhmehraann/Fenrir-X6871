@@ -12,9 +12,9 @@ In addition to custom code execution, Fenrir provides an automated in-memory bin
 | Parameter | Specification |
 | :--- | :--- |
 | **Reference Device** | Infinix GT 20 Pro (`X6871`) |
-| **SoC Platform** | MediaTek Dimensity 8200 Ultimate (`MT6895` |
+| **SoC Platform** | MediaTek Dimensity 8200 Ultimate (`MT6895`) |
 | **Instruction Set** | AArch64 (ARMv8.2-A / ARMv9-A) |
-| **Operating Systems** | Android 14, Android 15, Android 16 (`BP2A` / `X6871-OP-16.3`) |
+| **Operating Systems** | Android 16 |
 | **Container Format** | MediaTek Image Container v2 (512-byte `ImageHeader`, dual `cert1`/`cert2`) |
 | **Target Partition** | `lk` / `lk_a` / `lk_b` |
 | **LittleKernel Base** | `0xFFFF000050F00000` |
