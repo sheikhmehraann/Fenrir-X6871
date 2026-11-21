@@ -130,11 +130,8 @@ bl    0xffff000050f02800    ; Machine code: 2C C4 FF 97
 ### Stage 1 Payload Execution
 When control jumps to `0xFFFF000050F02800`:
 1. **Bare-metal Context**: EL1 non-secure, MMU active, identity-mapped virtual addresses.
-2. **Hardware Key Check**: Invokes `detect_key(1)` (Volume Down).
-3. **Mode Override**: If Volume Down is pressed:
-   - Sets `*(uint32_t*)0xFFFF000050FE4968 = 99` (`BOOT_MODE_FASTBOOT`).
-   - Sets secondary buffer at `0xFFFF000050FD5510 = 99`.
-   - Calls fastboot handler setup at `0xFFFF000050F7D684`.
+2. **Fastboot Handler Registration**: Calls fastboot handler setup at `0xFFFF000050F7D684` and registers custom fastboot commands.
+3. **Boot Mode Handling**: When Fastboot mode is requested (via `adb reboot bootloader` or recovery), ensures `BOOT_MODE_FASTBOOT` (`99` / `0x63`) is written to `g_boot_mode` (`0xFFFF000050FE4968`) and secondary buffer (`0xFFFF000050FD5510`).
 4. **Register Preservation**: Saves and restores `x29`, `x30`, and standard parameter registers.
 5. **Return**: Issues `ret` to resume standard LittleKernel initialization.
 

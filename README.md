@@ -37,10 +37,13 @@ The Preloader DER parser evaluates the first tag of `cert2`. When the parser enc
 Fenrir hooks LittleKernel immediately after the platform `boot_mode_check()` subroutine at virtual address `0xFFFF000050F11750`. The stock branch instruction is overwritten with a direct branch-with-link (`bl #0x2800`) to the Stage 1 payload situated in executable padding at `0xFFFF000050F02800`.
 
 Stage 1 executes bare-metal in EL1 context before hardware drivers and platform subsystems are initialized:
-- Queries PMIC hardware registers via `detect_key(FASTBOOT_KEY_INDEX)`.
-- If the physical Volume Down key is held down during boot, forces `BOOT_MODE_FASTBOOT` (`99` / `0x63`).
-- Initializes fastboot handler structures and registers custom command hooks.
-- Restores overwritten registers and returns cleanly to LittleKernel main flow.
+- Sets up fastboot handler structures and registers custom command hooks.
+- Preserves register state and returns cleanly to LittleKernel main flow.
+- Fastboot mode is entered via standard interface:
+  ```bash
+  adb reboot bootloader
+  ```
+  or by selecting **Bootloader** from Custom Recovery.
 
 ### 3. Android Verified Boot (AVB) & Green State Spoofing
 Under Android 16, system integrity checks require strict consistency across boot states:
@@ -250,13 +253,15 @@ If flashing manually from a host computer via Fastboot:
 
 ---
 
-## Hardware Emergency Fastboot Access
+## Booting to Fastboot Mode
 
-If the device encounters a bootloop during userspace testing or custom kernel development, Stage 1 provides unconditional hardware recovery access:
-1. Power off device (or force reboot by holding Power + Volume Up for 10 seconds).
-2. Hold **Volume Down**.
-3. Stage 1 intercepts the boot mode check before platform initialization and forces Fastboot mode (`99`).
-4. The device boots directly into Fastboot, bypassing kernel crashes and watchdog resets.
+To reboot the Infinix GT 20 Pro into Fastboot mode:
+1. **Via ADB** (from Android OS or Custom Recovery):
+   ```bash
+   adb reboot bootloader
+   ```
+2. **Via Custom Recovery UI** (TWRP / OrangeFox / PitchBlack):
+   Navigate to **Reboot** menu and select **Bootloader**.
 
 ---
 

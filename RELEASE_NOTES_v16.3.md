@@ -29,12 +29,14 @@
    - In Fastboot: Run `fastboot erase metadata` and `fastboot -w`.
    All subsequent boots will generate and maintain hardware-backed File-Based Encryption (FBE) keys derived under the Green Root of Trust without requiring further wipes.
 
-4. **Hardware Emergency Fastboot Shortcut (Unbrick Guarantee)**:
-   Stage 1 contains a bare-metal PMIC hardware key poller executing before LittleKernel platform drivers initialize. If you encounter a bootloop caused by experimental kernel modules, GSI incompatibilities, or userspace crashes:
-   - Power off the device (or force shutdown by holding Power + Volume Up for 10 seconds).
-   - Hold **Volume Down**.
-   - Power on while continuing to hold **Volume Down**.
-   - The Stage 1 payload intercepts the boot check and immediately forces Fastboot mode (`99` / `0x63`).
+4. **Booting to Fastboot Mode**:
+   To enter Fastboot mode on the Infinix GT 20 Pro:
+   - **Via ADB** (with device in Android OS or Recovery):
+     ```bash
+     adb reboot bootloader
+     ```
+   - **Via Custom Recovery UI** (TWRP / OrangeFox):
+     Navigate to the **Reboot** menu and select **Bootloader**.
 
 ---
 
@@ -81,7 +83,7 @@ MediaTek's Preloader (`BL2_EXT`) verifies partition integrity using an ASN.1 DER
 ### 2. Stage 1 Bare-Metal Execution Pivot
 - **Hook Site**: `0xFFFF000050F11750` (overwrites post-`boot_mode_check()` branch with `bl 0xFFFF000050F02800` / opcode `2C C4 FF 97`).
 - **Payload Location**: `0xFFFF000050F02800` (728 bytes of verified AArch64 machine code).
-- **Function**: Queries physical Volume Down key state (`detect_key(1)`). If held, writes `99` into `g_boot_mode` (`0xFFFF000050FE4968`) and the secondary buffer (`0xFFFF000050FD5510`), registers custom fastboot commands, and returns cleanly to main LittleKernel flow.
+- **Function**: Executes bare-metal in EL1 context before platform drivers load. Initializes fastboot handler structures, registers custom command hooks, manages bootmode transitions directly when entering fastboot via `adb reboot bootloader`, and returns cleanly to main LittleKernel flow.
 
 ---
 
