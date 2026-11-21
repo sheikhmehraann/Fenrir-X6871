@@ -2,7 +2,7 @@
 
 ## 1. MediaTek Boot Chain Anatomy
 
-The boot process of modern MediaTek Dimensity SoCs (such as the Dimensity 8200 Ultimate / `MT6895`) is divided into distinct execution stages spanning multiple privilege levels (EL3, EL2, EL1, EL0):
+The boot process of modern MediaTek Dimensity SoCs (such as the Dimensity 8200 Ultimate / `MT6895` / `MT6896`) is divided into distinct execution stages spanning multiple privilege levels (EL3, EL2, EL1, EL0):
 
 ```
 +-------------------------------------------------------------+
@@ -178,8 +178,8 @@ Fenrir applies 27 binary patches to LittleKernel to eliminate security checks, w
 
 ## 6. TrustZone (TEE) Root of Trust & FBE Key Derivation
 
-### The Android 14/15/16 Failure Mode
-On modern Android versions, File-Based Encryption (FBE) master keys are bound to the hardware Root of Trust. During boot, Android's `vold` daemon communicates with Keystore2 / Keymint, which executes inside the Trusted Execution Environment (TEE).
+### The Android 16 Failure Mode
+On modern Android versions (specifically Android 16 on X6871-OP-16.3), File-Based Encryption (FBE) master keys are bound to the hardware Root of Trust. During boot, Android's `vold` daemon communicates with Keystore2 / Keymint, which executes inside the Trusted Execution Environment (TEE).
 
 When LittleKernel prepares to launch the Linux kernel, it issues Secure Monitor Call 2 (SMC Fast Call) to TEE:
 ```armasm

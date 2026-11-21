@@ -3,7 +3,7 @@
 ## Abstract
 Fenrir is a low-level bootloader research framework and payload injection toolkit targeting MediaTek Dimensity platforms utilizing the MediaTek Container v2 format. The framework exploits an ASN.1 DER parser context handling vulnerability in the Preloader `BL2_EXT` certificate verification engine, redirecting execution into a custom multi-stage AArch64 payload before platform hardware initialization.
 
-In addition to custom code execution, Fenrir provides an automated in-memory binary patching engine that intercepts LittleKernel runtime security enforcement, Android Verified Boot (AVB) state propagation, and TrustZone (TEE) Root of Trust synchronization. This enables booting modified or custom system images with `verifiedbootstate=green` and `device_state=locked` while preserving hardware-backed File-Based Encryption (FBE) under Android 14, 15, and 16.
+In addition to custom code execution, Fenrir provides an automated in-memory binary patching engine that intercepts LittleKernel runtime security enforcement, Android Verified Boot (AVB) state propagation, and TrustZone (TEE) Root of Trust synchronization. This enables booting modified or custom system images with `verifiedbootstate=green` and `device_state=locked` while preserving hardware-backed File-Based Encryption (FBE) under Android 16.
 
 ---
 
@@ -11,10 +11,10 @@ In addition to custom code execution, Fenrir provides an automated in-memory bin
 
 | Parameter | Specification |
 | :--- | :--- |
-| **Reference Device** | Infinix GT 20 Pro (`X6871`) |
-| **SoC Platform** | MediaTek Dimensity 8200 Ultimate (`MT6895`) |
+| **Reference Device** | Infinix GT 20 Pro (`X6871` / `X6871-OP`) |
+| **SoC Platform** | MediaTek Dimensity 8200 Ultimate (`MT6895` / `MT6896`) |
 | **Instruction Set** | AArch64 (ARMv8.2-A / ARMv9-A) |
-| **Operating Systems** | Android 16 |
+| **Operating System** | Android 16 (`X6871-OP-16.3` / `BP2A.250605.031.A3`) |
 | **Container Format** | MediaTek Image Container v2 (512-byte `ImageHeader`, dual `cert1`/`cert2`) |
 | **Target Partition** | `lk` / `lk_a` / `lk_b` |
 | **LittleKernel Base** | `0xFFFF000050F00000` |
@@ -43,7 +43,7 @@ Stage 1 executes bare-metal in EL1 context before hardware drivers and platform 
 - Restores overwritten registers and returns cleanly to LittleKernel main flow.
 
 ### 3. Android Verified Boot (AVB) & Green State Spoofing
-Modern Android systems (Android 14+) require strict consistency across boot states:
+Under Android 16, system integrity checks require strict consistency across boot states:
 - `androidboot.verifiedbootstate=green`
 - `androidboot.locked=1`
 - `androidboot.vbmeta.device_state=locked`
@@ -55,7 +55,7 @@ Simple kernel command-line spoofing is insufficient because userspace init and `
 - Orange warning splash screens and delay timers are neutralized.
 
 ### 4. TrustZone (TEE) Root of Trust Synchronization
-Under Android 14+, Keymint and `vold` derive hardware-backed master encryption keys (`user0`) by querying the Trusted Execution Environment (Microtrust / Trustonic TEE) via Secure Monitor Calls. LittleKernel passes the verified boot state and public key digest to TEE via SMC Call 2:
+Under Android 16, Keymint and `vold` derive hardware-backed master encryption keys (`user0`) by querying the Trusted Execution Environment (Microtrust / Trustonic TEE) via Secure Monitor Calls. LittleKernel passes the verified boot state and public key digest to TEE via SMC Call 2:
 - Register `x0`: `0xBF000002` (Fast SMC Call 2)
 - Register `x1`: Sub-function ID
 - Register `x2`: Verified Boot State (`0` = GREEN, `1` = ORANGE, `2` = YELLOW)
@@ -213,47 +213,50 @@ Expected output:
 
 ---
 
-## Flashing to Hardware
+## Flashing Guides
 
-### Step 1: Boot Device to Fastboot
-```bash
-adb reboot bootloader
-```
+### Guide 1: Recovery Flashing Guide (Recommended)
+This is the standard, safest method using the flashable ZIP package:
+1. **Reboot to Recovery**: Boot your device into TWRP, OrangeFox, or PitchBlack recovery.
+2. **Flash Package**: Flash `X6871-Fenrir-16.3-Flashable.zip`.
+3. **Wipe Metadata and Format Data**: In Recovery Wipe menu, wipe Metadata, select `Format Data`, and type `yes`.
+4. **Reboot**: Select `Reboot System`.
 
-### Step 2: Flash LittleKernel
-Execute the flashing script (handles slot detection and flashing to active slot):
-```bash
-# Linux / WSL
-./flash.sh x6871-fenrir.bin
+### Guide 2: Fastboot Flashing Guide (Manual CLI)
+If flashing manually from a host computer via Fastboot:
+1. **Reboot to Fastboot**:
+   ```bash
+   adb reboot bootloader
+   ```
+2. **Flash Patched LittleKernel**:
+   ```bash
+   fastboot flash lk_a x6871-fenrir.bin
+   fastboot flash lk_b x6871-fenrir.bin
+   ```
+3. **Flash Disabled VBMeta (flags=2)**:
+   ```bash
+   fastboot flash vbmeta_a vbmeta_x6871_disabled_signed.img
+   fastboot flash vbmeta_b vbmeta_x6871_disabled_signed.img
+   ```
+4. **Wipe Metadata & Format Data**:
+   ```bash
+   fastboot erase metadata
+   fastboot -w
+   ```
+5. **Reboot Device**:
+   ```bash
+   fastboot reboot
+   ```
 
-# Windows PowerShell
-.\flash.ps1 -Image x6871-fenrir.bin
-```
+---
 
-Or execute fastboot commands manually:
-```bash
-fastboot flash lk_a x6871-fenrir.bin
-fastboot flash lk_b x6871-fenrir.bin
-```
+## Hardware Emergency Fastboot Access
 
-### Step 3: Flash Disabled VBMeta (Required for DSU / GSI / Ports / Custom Roms)
-If booting custom partitions or modifying system images, flash an AVB VBMeta image with `flags = 2`:
-```bash
-# Generate disabled vbmeta from stock
-python tools/make_disabled_vbmeta.py -s /path/to/stock_vbmeta.img -o vbmeta_disabled.img
-
-# Flash to both slots
-fastboot flash vbmeta_a vbmeta_disabled.img
-fastboot flash vbmeta_b vbmeta_disabled.img
-```
-
-### Step 4: First Boot / Data Format Requirement
-If migrating from an existing installation where `/data` was encrypted under an unpatched (ORANGE/UNLOCKED) state, Android's Keymint and `vold` will detect the new GREEN/LOCKED Root of Trust and fail to decrypt old keys (`init_user0_failed`). A one-time format is required:
-```bash
-fastboot -w
-fastboot reboot
-```
-Subsequent boots will generate new hardware-backed FBE keys synchronized with the Green Root of Trust.
+If the device encounters a bootloop during userspace testing or custom kernel development, Stage 1 provides unconditional hardware recovery access:
+1. Power off device (or force reboot by holding Power + Volume Up for 10 seconds).
+2. Hold **Volume Down**.
+3. Stage 1 intercepts the boot mode check before platform initialization and forces Fastboot mode (`99`).
+4. The device boots directly into Fastboot, bypassing kernel crashes and watchdog resets.
 
 ---
 
@@ -265,6 +268,9 @@ Subsequent boots will generate new hardware-backed FBE keys synchronized with th
 - **Fenrir Patched `x6871-fenrir.bin`**:
   - Size: `3,182,832` bytes
   - SHA-256: `FD712A72CC8AC1E7C387FD0F1EBDD735616C21D02F13A55826DE9D45B2B5A3E3`
+- **Flashable Package `X6871-Fenrir-16.3-Flashable.zip`**:
+  - Size: `5,707,888` bytes
+  - SHA-256: `A498FCD8151CE15EAA7B47C13C7A8873520FC0CFACBD879571C9E5E08DBF2E88`
 
 ---
 

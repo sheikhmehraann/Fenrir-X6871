@@ -2,8 +2,8 @@
 
 ## Target Device & Architecture
 - **Device**: Infinix GT 20 Pro (Model: `X6871`, `X6871-OP`)
-- **Platform**: MediaTek Dimensity 8200 Ultimate (`MT6895` / `MT6897`)
-- **Firmware Target**: Android 14 / Android 15 / Android 16 (`X6871-OP-16.3`, build `BP2A.250605.031.A3`)
+- **Platform**: MediaTek Dimensity 8200 Ultimate (`MT6895` / `MT6896`)
+- **Firmware Target**: Android 16 (`X6871-OP-16.3`, build `BP2A.250605.031.A3`)
 - **Architecture**: AArch64 (ARMv8.2-A / ARMv9-A)
 - **Container Format**: MediaTek Image Container v2 (dual cert1/cert2 layout)
 
@@ -12,7 +12,7 @@
 ## CRITICAL HARDWARE & SAFETY WARNINGS
 
 1. **Target Specificity**:
-   This release is compiled and verified specifically for the **Infinix GT 20 Pro (`X6871`)**. Do **NOT** attempt to flash these binaries onto other devices (such as Infinix GT 10 Pro `X6739`, Note series, or other Dimensity models) without adjusting memory offsets and pattern definitions according to `docs/DEVICE_PORTING.md`. Flashing mismatched bootloader code will result in a Preloader authentication panic (`0x701F`) or early DRAM initialization failure.
+   This release is compiled and verified specifically for the **Infinix GT 20 Pro (`X6871`)** running on **MediaTek Dimensity 8200 Ultimate (`MT6895` / `MT6896`)**. Do **NOT** attempt to flash these binaries onto other devices (such as Infinix GT 10 Pro `X6739`, Note series, or other SoCs) without adjusting memory offsets and pattern definitions according to `docs/DEVICE_PORTING.md`. Flashing mismatched bootloader code will result in a Preloader authentication panic (`0x701F`) or early DRAM aborts.
 
 2. **Bootloader Unlock Prerequisite**:
    Your device bootloader must be unlocked via standard fastboot prior to flashing:
@@ -23,11 +23,10 @@
 
 3. **Mandatory Userdata Format (Root of Trust Migration)**:
    If your device was previously running with an unpatched bootloader (where LittleKernel reported `ORANGE` / `unlocked` state to the TrustZone TEE), your current `/data` partition was encrypted using an encryption key derived from that untrusted state.
-   Because Fenrir synchronizes the bootloader with the genuine OEM `GREEN` / `locked` Root of Trust, Android's Keymint and `vold` daemons will fail to decrypt existing keys derived under the old ORANGE context, triggering `init_user0_failed` (status 25) and booting into recovery.
+   Because Fenrir synchronizes the bootloader with the genuine OEM `GREEN` / `locked` Root of Trust, Android 16's Keymint and `vold` daemons will fail to decrypt existing keys derived under the old ORANGE context, triggering `init_user0_failed` (status 25) and booting into recovery.
    **You MUST perform a one-time userdata format upon first installation:**
-   ```bash
-   fastboot -w
-   ```
+   - In Recovery: Select `Format Data` (and wipe metadata).
+   - In Fastboot: Run `fastboot erase metadata` and `fastboot -w`.
    All subsequent boots will generate and maintain hardware-backed File-Based Encryption (FBE) keys derived under the Green Root of Trust without requiring further wipes.
 
 4. **Hardware Emergency Fastboot Shortcut (Unbrick Guarantee)**:
@@ -36,6 +35,41 @@
    - Hold **Volume Down**.
    - Power on while continuing to hold **Volume Down**.
    - The Stage 1 payload intercepts the boot check and immediately forces Fastboot mode (`99` / `0x63`).
+
+---
+
+## Flashing Guides
+
+### Guide 1: Recovery Flashing Guide (Recommended)
+1. **Reboot to Recovery**: Boot your device into TWRP, OrangeFox, or PitchBlack recovery.
+2. **Flash Package**: Flash the `X6871-Fenrir-16.3-Flashable.zip` package.
+3. **Wipe Metadata & Format Data**: Go to Wipe menu, wipe Metadata, select `Format Data`, and type `yes`.
+4. **Reboot**: Select `Reboot System`.
+
+### Guide 2: Fastboot Flashing Guide (Manual CLI)
+1. **Reboot to Fastboot**:
+   ```bash
+   adb reboot bootloader
+   ```
+2. **Flash Patched LittleKernel (both slots)**:
+   ```bash
+   fastboot flash lk_a x6871-fenrir.bin
+   fastboot flash lk_b x6871-fenrir.bin
+   ```
+3. **Flash Disabled VBMeta (both slots)**:
+   ```bash
+   fastboot flash vbmeta_a vbmeta_x6871_disabled_signed.img
+   fastboot flash vbmeta_b vbmeta_x6871_disabled_signed.img
+   ```
+4. **Wipe Metadata & Format Data**:
+   ```bash
+   fastboot erase metadata
+   fastboot -w
+   ```
+5. **Reboot Device**:
+   ```bash
+   fastboot reboot
+   ```
 
 ---
 
@@ -68,7 +102,7 @@ Fenrir applies 27 binary patches to LittleKernel partition data:
 | **09** | `force_avb_skip_cert_vfy` | AVB cert verification loop | Unconditionally branches to `avb_ret = 0` (success), skipping public key certificate chain evaluation. |
 | **10** | `force_avb_img_auth_0` | `load_vfy_boot()` | Forces `img_auth_required = 0` and sets `ALLOW_VERIFICATION_ERROR = 1`, permitting boots with modified images. |
 | **11** | `force_img_auth_check_0` | `img_auth_check()` callback | Forces the image authentication callback to unconditionally return `0` (success). |
-| **12** | `force_avb_verity_mode_ignore_corruption` | dm-verity policy handler | Sets dm-verity error handling to `ignore_corruption` while emitting `androidboot.veritymode=enforcing`, preventing userspace init panic `0x2C002000` while supporting DSU and GSIs. |
+| **12** | `force_avb_verity_mode_ignore_corruption` | dm-verity policy handler | Sets dm-verity error handling to `ignore_corruption` while emitting `androidboot.veritymode=enforcing`, preventing Android 16 userspace init panic `0x2C002000` while supporting DSU and GSIs. |
 | **13** | `dont_relock_seccfg` | `seccfg` security manager | Neutralizes the routine that clears or re-locks the `seccfg` security partition. |
 | **14** | `disable_ap_watchdog` | `mtk_wdt_enable()` | Modifies watchdog enable routine to deactivate the Application Processor (AP) hardware watchdog timer, preventing reboot loops during boot. |
 | **15** | `disable_ap_watchdog_doe` | `mtk_wdt_doe_setup()` | Deactivates the secondary hardware watchdog timer prior to kernel handoff. |
@@ -84,41 +118,6 @@ Fenrir applies 27 binary patches to LittleKernel partition data:
 | **25** | `force_set_verified_boot_state_green` | `set_verified_boot_state()` | Unconditionally writes `0` (`BOOT_STATE_GREEN`) into global variable `g_verified_boot_state` at `0xFFFF000051006C18`. |
 | **26** | `force_set_avb_boot_state_green` | `set_avb_boot_state()` | Unconditionally writes `0` (`AVB_BOOT_STATE_GREEN`) into secondary buffer at `0xFFFF000050FD5510`. |
 | **27** | `force_get_lock_state_locked` | `get_lock_state()` path | Unconditionally branches to the locked return path (`LKS_LOCK = 4`) in AVB lock state evaluation. |
-
----
-
-## Flashing & Installation Instructions
-
-### Method A: Automated Flashable ZIP (Recommended)
-Download `X6871-Fenrir-16.3-Flashable.zip` and use your preferred platform flasher:
-- **Windows**: Extract the ZIP, connect device in Fastboot mode, and run `flash_windows.bat`.
-- **Linux**: Extract the ZIP, make scripts executable (`chmod +x *.sh`), and run `./flash_linux.sh`.
-- **Termux (Android)**: Run `./flash_termux.sh`.
-- **Custom Recovery**: Flash the ZIP directly in TWRP or OrangeFox recovery.
-
-### Method B: Manual Fastboot CLI
-1. Boot device into Fastboot mode:
-   ```bash
-   adb reboot bootloader
-   ```
-2. Flash the patched LittleKernel image to both slots:
-   ```bash
-   fastboot flash lk_a x6871-fenrir.bin
-   fastboot flash lk_b x6871-fenrir.bin
-   ```
-3. Flash the disabled VBMeta image (flags=2) to both slots:
-   ```bash
-   fastboot flash vbmeta_a vbmeta_x6871_disabled_signed.img
-   fastboot flash vbmeta_b vbmeta_x6871_disabled_signed.img
-   ```
-4. Wipe userdata on initial installation:
-   ```bash
-   fastboot -w
-   ```
-5. Reboot into Android:
-   ```bash
-   fastboot reboot
-   ```
 
 ---
 

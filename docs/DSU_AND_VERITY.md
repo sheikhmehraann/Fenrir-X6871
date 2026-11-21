@@ -1,15 +1,15 @@
-# DSU, dm-verity, and VBMeta Flags on Android 14/15/16
+# DSU, dm-verity, and VBMeta Flags on Android 16
 
 ## 1. Overview
-On modern Android devices running Android 14, 15, and 16, dm-verity integrity checks operate in concert with Android Verified Boot (AVB 2.0) and userspace initialization policies. Booting modified system partitions, Generic System Images (GSIs), or Dynamic System Updates (DSU) without tripping verification errors requires precise alignment between LittleKernel command-line generation and VBMeta header flags.
+On modern Android devices running Android 16 (specifically Infinix GT 20 Pro on X6871-OP-16.3), dm-verity integrity checks operate in concert with Android Verified Boot (AVB 2.0) and userspace initialization policies. Booting modified system partitions, Generic System Images (GSIs), or Dynamic System Updates (DSU) without tripping verification errors requires precise alignment between LittleKernel command-line generation and VBMeta header flags.
 
 ---
 
-## 2. The Android 14 Userspace Command-Line Trap
+## 2. The Android 16 Userspace Command-Line Trap
 
 In older Android versions (Android 11-13), custom bootloader developers frequently modified LittleKernel to append `androidboot.veritymode=disabled` to the kernel command-line.
 
-On Android 14+, this approach triggers a critical userspace failure:
+On Android 16, this approach triggers a critical userspace failure:
 1. LittleKernel passes `androidboot.veritymode=disabled` along with `androidboot.verifiedbootstate=green` and `androidboot.locked=1`.
 2. The Linux kernel mounts the root filesystem and executes `/system/bin/init` (EL0).
 3. Android `init` evaluates the security descriptor matrix:
@@ -23,7 +23,7 @@ On Android 14+, this approach triggers a critical userspace failure:
 
 ## 3. The Fenrir Dual-Mode Solution
 
-To bypass dm-verity verification on custom or modified partitions without triggering the Android 14 userspace init crash, Fenrir utilizes a dual-mode mechanism:
+To bypass dm-verity verification on custom or modified partitions without triggering the Android 16 userspace init crash, Fenrir utilizes a dual-mode mechanism:
 
 ### Component A: Kernel Command-Line
 LittleKernel is configured to preserve `veritymode=enforcing`:
