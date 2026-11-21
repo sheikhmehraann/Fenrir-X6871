@@ -258,16 +258,6 @@ Subsequent boots will generate new hardware-backed FBE keys synchronized with th
 
 ---
 
-## Hardware Emergency Fastboot Access
-
-If the device encounters a bootloop during userspace testing or custom kernel development, Stage 1 provides unconditional hardware recovery access:
-1. Power off device (or force reboot by holding Power + Volume Up for 10 seconds).
-2. Hold **Volume Down**.
-3. Stage 1 intercepts the boot mode check before platform initialization and forces Fastboot mode (`99`).
-4. The device boots directly into Fastboot, bypassing kernel crashes and watchdog resets.
-
----
-
 ## Reference Hashes (Infinix GT 20 Pro X6871)
 
 - **Stock `lk.img`**:
